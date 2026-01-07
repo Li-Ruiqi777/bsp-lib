@@ -65,13 +65,16 @@ target_link_libraries(test_led bsp)
 
 
 # 安装规则
+# DESTINATION为 CMAKE_INSTALL_PREFIX
+set(CMAKE_INSTALL_PREFIX /home/lrq/linux/nfs/qtrootfs/usr)
+
+# make install
 install(TARGETS bsp 
                 bsp_tool 
                 test_led
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
 )
-
 install(FILES bsp.h DESTINATION include)
 install(DIRECTORY src/common DESTINATION include/bsp FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY src/driver DESTINATION include/bsp FILES_MATCHING PATTERN "*.h")

@@ -1,4 +1,4 @@
-#include "../bsp.h"
+#include "../bsp_inner.h"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
