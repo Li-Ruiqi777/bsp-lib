@@ -23,6 +23,7 @@ set(COMMON_SOURCES
 set(DRIVER_SOURCES
     src/driver/led/led.cpp
     src/driver/key/key.cpp
+    src/driver/ap3216c/ap3216c.cpp
 )
 
 # 所有库源文件
@@ -72,6 +73,10 @@ target_link_libraries(test_led bsp)
 add_executable(test_key test/test_key.cpp)
 target_link_libraries(test_key bsp)
 
+# AP3216C 测试
+add_executable(test_ap3216c test/test_ap3216c.cpp)
+target_link_libraries(test_ap3216c bsp)
+
 
 # 安装规则
 # DESTINATION为 CMAKE_INSTALL_PREFIX
@@ -80,7 +85,7 @@ set(CMAKE_INSTALL_PREFIX /home/lrq/linux/nfs/qtrootfs/usr)
 # make install
 install(TARGETS bsp 
                 bsp_tool 
-                test_led test_key
+                test_led test_key test_ap3216c
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
 )

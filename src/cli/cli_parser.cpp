@@ -55,6 +55,17 @@ Command CliParser::parse(int argc, char *argv[])
         }
     }
 
+    // 解析 AP3216C 命令: bsp_tool ap3216c read [dev_name]
+    if (argc >= 2 && std::strcmp(argv[1], "ap3216c") == 0)
+    {
+        if (argc >= 3 && std::strcmp(argv[2], "read") == 0)
+        {
+            cmd.type = CommandType::AP3216CRead;
+            cmd.ap3216c_args.dev_name = (argc >= 4) ? argv[3] : "ap3216c";
+            return cmd;
+        }
+    }
+
     return cmd;
 }
 
@@ -66,6 +77,8 @@ void CliParser::printHelp()
     std::printf("Commands:\n");
     std::printf("  led set <dev_name> <on|off>    Set LED state\n");
     std::printf("                                 Example: bsp_tool led set led0 on\n");
+    std::printf("  ap3216c read [dev_name]        Read AP3216C sensor data\n");
+    std::printf("                                 Example: bsp_tool ap3216c read ap3216c\n");
     std::printf("  -h, --help                     Show this help message\n");
     std::printf("  -v, --version                  Show version information\n");
     std::printf("\n");

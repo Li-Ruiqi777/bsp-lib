@@ -6,10 +6,11 @@
 
 // 引入各硬件模块接口声明
 #include "bsp/driver/led/led.h"
+#include "bsp/driver/key/key.h"
+#include "bsp/driver/ap3216c/ap3216c.h"
 
-// v1.1 版本将包含以下模块：
+// 后续版本将包含以下模块：
 // #include "bsp/driver/beep/beep.h"
-// #include "bsp/driver/key/key.h"
 // #include "bsp/driver/camera/camera.h"
 // #include "bsp/driver/imu/imu.h"
 // #include "bsp/driver/barometer/barometer.h"

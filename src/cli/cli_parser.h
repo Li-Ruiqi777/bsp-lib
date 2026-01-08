@@ -11,6 +11,7 @@ namespace bsp
 enum class CommandType
 {
     LedSet,
+    AP3216CRead,
     Version,
     Help,
     Unknown
@@ -23,11 +24,18 @@ struct LedCommandArgs
     bool state; // true-on, false-off
 };
 
+// AP3216C 命令参数
+struct AP3216CCommandArgs
+{
+    std::string dev_name;
+};
+
 // 解析后的命令结构
 struct Command
 {
     CommandType type;
     LedCommandArgs led_args;
+    AP3216CCommandArgs ap3216c_args;
 };
 
 /**

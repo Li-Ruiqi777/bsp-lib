@@ -1,5 +1,4 @@
 #include "key.h"
-#include "../../common/bsp_common.h"
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
