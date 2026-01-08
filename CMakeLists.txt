@@ -22,6 +22,7 @@ set(COMMON_SOURCES
 # 驱动模块源文件
 set(DRIVER_SOURCES
     src/driver/led/led.cpp
+    src/driver/key/key.cpp
 )
 
 # 所有库源文件
@@ -31,7 +32,9 @@ set(LIB_SOURCES
 )
 
 # 创建动态库
-add_library(bsp SHARED ${LIB_SOURCES})
+add_library(bsp SHARED 
+    ${LIB_SOURCES}
+)
 
 # 设置库的头文件包含路径
 target_include_directories(bsp PUBLIC
@@ -40,7 +43,9 @@ target_include_directories(bsp PUBLIC
 )
 
 # 链接库
-target_link_libraries(bsp pthread)
+target_link_libraries(bsp PUBLIC
+    pthread
+)
 
 # 设置库版本
 set_target_properties(bsp PROPERTIES
@@ -63,6 +68,10 @@ target_link_libraries(bsp_tool bsp)
 add_executable(test_led test/test_led.cpp)
 target_link_libraries(test_led bsp)
 
+# KEY 测试
+add_executable(test_key test/test_key.cpp)
+target_link_libraries(test_key bsp)
+
 
 # 安装规则
 # DESTINATION为 CMAKE_INSTALL_PREFIX
@@ -71,7 +80,7 @@ set(CMAKE_INSTALL_PREFIX /home/lrq/linux/nfs/qtrootfs/usr)
 # make install
 install(TARGETS bsp 
                 bsp_tool 
-                test_led
+                test_led test_key
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
 )

@@ -1,0 +1,7 @@
+{
+    "editor.semanticTokenColorCustomizations": {
+    "rules": {
+      "property": "#edb167",
+    }
+  },
+}
