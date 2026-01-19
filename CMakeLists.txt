@@ -8,42 +8,32 @@ include(cmake/toolchain.cmake)
 list(APPEND CMAKE_PREFIX_PATH "/home/lrq/linux/nfs/qtrootfs/usr/")
 find_package(spdlog REQUIRED)
 
-# 公共基础层源文件
-set(COMMON_SOURCES
-    src/common/error.cpp
-    src/common/utils.cpp
+# ============================================================================
+# 源码目录
+# ============================================================================
+add_subdirectory(src)
+
+# ============================================================================
+# 创建bsp动态库
+# ============================================================================
+add_library(bsp SHARED
+    src/bsp.cpp
 )
 
-# 驱动模块源文件
-set(DRIVER_SOURCES
-    src/driver/led/led.cpp
-    src/driver/key/key.cpp
-    src/driver/ap3216c/ap3216c.cpp
-)
-
-# 所有库源文件
-set(LIB_SOURCES
-    ${COMMON_SOURCES}
-    ${DRIVER_SOURCES}
-)
-
-# 创建动态库
-add_library(bsp SHARED 
-    ${LIB_SOURCES}
+target_link_libraries(bsp 
+PUBLIC
+    bsp_driver
+    bsp_common
+    pthread
+    spdlog::spdlog
 )
 
 # 设置库的头文件包含路径
 target_include_directories(bsp 
-PRIVATE
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src
-)
-
-# 链接库
-target_link_libraries(bsp 
-PRIVATE
-    pthread
-    spdlog::spdlog
+PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
+    $<INSTALL_INTERFACE:include>
 )
 
 # 设置库版本
@@ -52,38 +42,19 @@ set_target_properties(bsp PROPERTIES
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
 
-# 命令行工具源文件
-set(CLI_SOURCES
-    src/cli/cli_parser.cpp
-    src/cli/bsp_tool_main.cpp
-)
+# ============================================================================
+# 测试程序
+# ============================================================================
+add_subdirectory(test)
 
-# 创建命令行工具
-add_executable(bsp_tool ${CLI_SOURCES})
-target_link_libraries(bsp_tool bsp)
-
-
-# LED 测试
-add_executable(test_led test/test_led.cpp)
-target_link_libraries(test_led bsp)
-
-# KEY 测试
-add_executable(test_key test/test_key.cpp)
-target_link_libraries(test_key bsp)
-
-# AP3216C 测试
-add_executable(test_ap3216c test/test_ap3216c.cpp)
-target_link_libraries(test_ap3216c bsp)
-
-
+# ============================================================================
 # 安装规则
-# DESTINATION为 CMAKE_INSTALL_PREFIX
+# ============================================================================
 set(CMAKE_INSTALL_PREFIX /home/lrq/linux/nfs/qtrootfs/usr)
 
-# make install
 install(TARGETS bsp 
                 bsp_tool 
-                test_led test_key test_ap3216c
+                test_led test_key test_ap3216c test_dht11
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
 )
@@ -91,10 +62,11 @@ install(FILES bsp.h DESTINATION include)
 install(DIRECTORY src/common DESTINATION include/bsp FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY src/driver DESTINATION include/bsp FILES_MATCHING PATTERN "*.h")
 
+# ============================================================================
 # 打印配置信息
+# ============================================================================
 message(STATUS "BSP Library Configuration:")
 message(STATUS "  Version: ${PROJECT_VERSION}")
 message(STATUS "  C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "  Install Prefix: ${CMAKE_INSTALL_PREFIX}")
-

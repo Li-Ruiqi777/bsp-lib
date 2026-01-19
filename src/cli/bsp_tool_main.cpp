@@ -2,6 +2,7 @@
 #include "../driver/led/led.h"
 #include "../driver/ap3216c/ap3216c.h"
 #include "cli_parser.h"
+#include <spdlog/spdlog.h>
 #include <cstdio>
 #include <cstdlib>
 
@@ -29,19 +30,18 @@ int main(int argc, char *argv[])
         ErrorCode ret = led.init();
         if (ret != ErrorCode::Ok)
         {
-            std::fprintf(stderr, "Error: Failed to init LED %s: %s\n", cmd.led_args.dev_name.c_str(),
-                         errorToString(ret).c_str());
+            spdlog::error("Failed to init LED {}: {}", cmd.led_args.dev_name, errorToString(ret));
             return 1;
         }
 
         ret = led.setState(cmd.led_args.state);
         if (ret != ErrorCode::Ok)
         {
-            std::fprintf(stderr, "Error: Failed to set LED state: %s\n", errorToString(ret).c_str());
+            spdlog::error("Failed to set LED state: {}", errorToString(ret));
             return 1;
         }
 
-        std::printf("LED %s set to %s\n", cmd.led_args.dev_name.c_str(), cmd.led_args.state ? "on" : "off");
+        spdlog::info("LED {} set to {}", cmd.led_args.dev_name, cmd.led_args.state ? "on" : "off");
         return 0;
     }
 
@@ -51,8 +51,7 @@ int main(int argc, char *argv[])
         ErrorCode ret = sensor.init();
         if (ret != ErrorCode::Ok)
         {
-            std::fprintf(stderr, "Error: Failed to init AP3216C %s: %s\n", cmd.ap3216c_args.dev_name.c_str(),
-                         errorToString(ret).c_str());
+            spdlog::error("Failed to init AP3216C {}: {}", cmd.ap3216c_args.dev_name, errorToString(ret));
             return 1;
         }
 
@@ -60,20 +59,20 @@ int main(int argc, char *argv[])
         ret = sensor.readData(data);
         if (ret != ErrorCode::Ok)
         {
-            std::fprintf(stderr, "Error: Failed to read AP3216C data: %s\n", errorToString(ret).c_str());
+            spdlog::error("Failed to read AP3216C data: {}", errorToString(ret));
             return 1;
         }
 
-        std::printf("AP3216C Sensor Data:\n");
-        std::printf("  IR (Infrared):  %u\n", data.ir);
-        std::printf("  ALS (Light):    %u\n", data.als);
-        std::printf("  PS (Proximity): %u\n", data.ps);
+        spdlog::info("AP3216C Sensor Data:");
+        spdlog::info("  IR (Infrared):  {}", data.ir);
+        spdlog::info("  ALS (Light):    {}", data.als);
+        spdlog::info("  PS (Proximity): {}", data.ps);
         return 0;
     }
 
     case CommandType::Unknown:
     default:
-        std::fprintf(stderr, "Error: Unknown command\n");
+        spdlog::error("Unknown command");
         CliParser::printHelp();
         return 1;
     }

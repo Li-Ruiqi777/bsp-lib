@@ -8,6 +8,7 @@
 #include "bsp/driver/led/led.h"
 #include "bsp/driver/key/key.h"
 #include "bsp/driver/ap3216c/ap3216c.h"
+#include "bsp/driver/dht11/dht11.h"
 
 // 后续版本将包含以下模块：
 // #include "bsp/driver/beep/beep.h"

@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <string>
-#include <spdlog/spdlog.h>
 
 namespace bsp
 {

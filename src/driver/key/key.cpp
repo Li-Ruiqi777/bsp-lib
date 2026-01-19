@@ -1,5 +1,5 @@
 #include "key.h"
-#include "common/bsp_common.h"
+#include <spdlog/spdlog.h>
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>

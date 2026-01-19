@@ -1,4 +1,4 @@
-#include "ap3216c.h"
+#include "dht11.h"
 #include <spdlog/spdlog.h>
 #include <cstdio>
 #include <cstring>
@@ -9,18 +9,18 @@
 namespace bsp
 {
 
-AP3216C::AP3216C(const std::string &devName)
+DHT11::DHT11(const std::string &devName)
     : devName(devName), fd(-1), initialized(false)
 {
     devPath = "/dev/" + devName;
 }
 
-AP3216C::~AP3216C()
+DHT11::~DHT11()
 {
     cleanup();
 }
 
-AP3216C::AP3216C(AP3216C &&other) noexcept
+DHT11::DHT11(DHT11 &&other) noexcept
     : devName(std::move(other.devName)), devPath(std::move(other.devPath)), fd(other.fd),
       initialized(other.initialized)
 {
@@ -28,7 +28,7 @@ AP3216C::AP3216C(AP3216C &&other) noexcept
     other.initialized = false;
 }
 
-AP3216C &AP3216C::operator=(AP3216C &&other) noexcept
+DHT11 &DHT11::operator=(DHT11 &&other) noexcept
 {
     if (this != &other)
     {
@@ -43,7 +43,7 @@ AP3216C &AP3216C::operator=(AP3216C &&other) noexcept
     return *this;
 }
 
-ErrorCode AP3216C::init()
+ErrorCode DHT11::init()
 {
     if (initialized)
     {
@@ -52,7 +52,7 @@ ErrorCode AP3216C::init()
     }
 
     // 打开设备节点
-    fd = open(devPath.c_str(), O_RDWR);
+    fd = open(devPath.c_str(), O_RDONLY);
     if (fd < 0)
     {
         spdlog::error("open {} failed", devPath);
@@ -64,7 +64,7 @@ ErrorCode AP3216C::init()
     return ErrorCode::Ok;
 }
 
-ErrorCode AP3216C::readData(AP3216CData &data)
+ErrorCode DHT11::readData(DHT11Data &data)
 {
     if (!initialized || fd < 0)
     {
@@ -72,9 +72,15 @@ ErrorCode AP3216C::readData(AP3216CData &data)
         return ErrorCode::DevNotReady;
     }
 
-    // 读取3个 uint16_t 数据
-    uint16_t rawData[3] = {0};
+    // 读取4个字节的数据：湿度整数、湿度小数、温度整数、温度小数
+    uint8_t rawData[4] = {0};
     ssize_t n = read(fd, rawData, sizeof(rawData));
+
+    if (n < 0)
+    {
+        spdlog::error("read from {} failed", devName);
+        return ErrorCode::DevIo;
+    }
 
     if (n != sizeof(rawData))
     {
@@ -84,27 +90,29 @@ ErrorCode AP3216C::readData(AP3216CData &data)
     }
 
     // 填充数据结构
-    data.ir = rawData[0];
-    data.als = rawData[1];
-    data.ps = rawData[2];
+    data.humidity_int = rawData[0];
+    data.humidity_decimal = rawData[1];
+    data.temperature_int = rawData[2];
+    data.temperature_decimal = rawData[3];
 
-    spdlog::debug("Read from {} - IR: {}, ALS: {}, PS: {}",
-                  devName, data.ir, data.als, data.ps);
+    spdlog::debug("Read from {} - Humidity: {}.{}% RH, Temperature: {}.{}°C",
+                  devName, data.humidity_int, data.humidity_decimal,
+                  data.temperature_int, data.temperature_decimal);
 
     return ErrorCode::Ok;
 }
 
-bool AP3216C::isReady() const
+bool DHT11::isReady() const
 {
     return initialized && fd >= 0;
 }
 
-std::string AP3216C::getDeviceName() const
+std::string DHT11::getDeviceName() const
 {
     return devName;
 }
 
-void AP3216C::cleanup()
+void DHT11::cleanup()
 {
     if (fd >= 0)
     {
@@ -115,3 +123,4 @@ void AP3216C::cleanup()
 }
 
 } // namespace bsp
+

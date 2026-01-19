@@ -1,5 +1,5 @@
-#ifndef BSP_AP3216C_H
-#define BSP_AP3216C_H
+#ifndef BSP_DHT11_H
+#define BSP_DHT11_H
 
 #include <string>
 #include <cstdint>
@@ -9,44 +9,45 @@ namespace bsp
 {
 
 /**
- * @brief AP3216C 环境光传感器数据结构
+ * @brief DHT11 温湿度传感器数据结构
  */
-struct AP3216CData
+struct DHT11Data
 {
-    uint16_t ir;   // 红外数据
-    uint16_t als;  // 环境光强度数据
-    uint16_t ps;   // 接近传感器数据（距离）
+    uint8_t humidity_int;    // 湿度整数部分
+    uint8_t humidity_decimal; // 湿度小数部分（DHT11通常为0）
+    uint8_t temperature_int;  // 温度整数部分
+    uint8_t temperature_decimal; // 温度小数部分（DHT11通常为0）
 };
 
 /**
- * @brief AP3216C 环境光传感器类
+ * @brief DHT11 温湿度传感器类
  *
- * 支持读取红外、环境光强度和距离传感器数据
+ * 支持读取温度和湿度数据
  */
-class AP3216C
+class DHT11
 {
 public:
     /**
      * @brief 构造函数
-     * @param devName AP3216C 设备名（如 "ap3216c"，对应 /dev/ap3216c）
+     * @param devName DHT11 设备名（如 "dht11"，对应 /dev/dht11）
      */
-    explicit AP3216C(const std::string &devName = "ap3216c");
+    explicit DHT11(const std::string &devName = "dht11");
 
     /**
      * @brief 析构函数，自动释放资源
      */
-    ~AP3216C();
+    ~DHT11();
 
     // 禁止拷贝构造和赋值
-    AP3216C(const AP3216C &) = delete;
-    AP3216C &operator=(const AP3216C &) = delete;
+    DHT11(const DHT11 &) = delete;
+    DHT11 &operator=(const DHT11 &) = delete;
 
     // 允许移动构造和赋值
-    AP3216C(AP3216C &&other) noexcept;
-    AP3216C &operator=(AP3216C &&other) noexcept;
+    DHT11(DHT11 &&other) noexcept;
+    DHT11 &operator=(DHT11 &&other) noexcept;
 
     /**
-     * @brief 初始化 AP3216C 设备
+     * @brief 初始化 DHT11 设备
      * @return ErrorCode::Ok 成功，其他错误码失败
      */
     ErrorCode init();
@@ -56,7 +57,7 @@ public:
      * @param data 传感器数据结构体引用，用于存储读取的数据
      * @return ErrorCode::Ok 成功，其他错误码失败
      */
-    ErrorCode readData(AP3216CData &data);
+    ErrorCode readData(DHT11Data &data);
 
     /**
      * @brief 检查设备是否已初始化
@@ -81,4 +82,5 @@ private:
 
 } // namespace bsp
 
-#endif // BSP_AP3216C_H
+#endif // BSP_DHT11_H
+

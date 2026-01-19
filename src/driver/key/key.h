@@ -7,7 +7,7 @@
 #include <atomic>
 #include <chrono>
 #include <linux/input.h>
-#include "common/bsp_common.h"
+#include "../../common/bsp_common.h"
 
 namespace bsp
 {
