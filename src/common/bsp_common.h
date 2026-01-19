@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include <spdlog/spdlog.h>
 
 namespace bsp
 {
@@ -19,28 +20,6 @@ enum class ErrorCode
     Unsupported = -6   // 不支持的操作（如非法分辨率配置）
 };
 
-// 日志级别定义
-enum class LogLevel
-{
-    Debug = 0,
-    Info = 1,
-    Warn = 2,
-    Error = 3
-};
-
-// 日志系统类
-class Logger
-{
-public:
-    static void setLevel(LogLevel level);
-    static LogLevel getLevel();
-    static void log(LogLevel level, const std::string &module, const char *file, int line, const char *fmt,
-                    ...);
-
-private:
-    static LogLevel current_level_;
-};
-
 // 错误码转字符串
 std::string errorToString(ErrorCode err);
 
@@ -48,19 +27,6 @@ std::string errorToString(ErrorCode err);
 constexpr int VERSION_MAJOR = 1;
 constexpr int VERSION_MINOR = 0;
 constexpr int VERSION_PATCH = 0;
-
-// 日志宏（简化使用）
-#define BSP_LOG_DEBUG(module, fmt, ...)                                                                      \
-    bsp::Logger::log(bsp::LogLevel::Debug, module, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-
-#define BSP_LOG_INFO(module, fmt, ...)                                                                       \
-    bsp::Logger::log(bsp::LogLevel::Info, module, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-
-#define BSP_LOG_WARN(module, fmt, ...)                                                                       \
-    bsp::Logger::log(bsp::LogLevel::Warn, module, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
-
-#define BSP_LOG_ERROR(module, fmt, ...)                                                                      \
-    bsp::Logger::log(bsp::LogLevel::Error, module, __FILE__, __LINE__, fmt, ##__VA_ARGS__)
 
 } // namespace bsp
 

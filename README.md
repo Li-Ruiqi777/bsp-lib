@@ -18,10 +18,7 @@ BSP Library - 嵌入式 Linux 系统硬件抽象层库
 # 创建构建目录
 mkdir build && cd build
 
-# 配置调试日志
-cmake ..  -DBSP_LOG_LEVEL_DEBUG=ON
-# 或 
-cmake ..  -DBSP_LOG_LEVEL_DEBUG=OFF
+cmake ..
 
 # 编译
 make -j$nproc
@@ -64,23 +61,6 @@ bsp_tool -h
 bsp_tool -v
 ...
 ```
-
-### 日志系统
-
-日志系统通过 `Logger` 类提供：
-
-```cpp
-// 设置日志级别
-bsp::Logger::setLevel(bsp::LogLevel::Info);
-
-// 使用日志宏
-BSP_LOG_DEBUG("MODULE", "Debug message: %d", value);
-BSP_LOG_INFO("MODULE", "Info message");
-BSP_LOG_WARN("MODULE", "Warning message");
-BSP_LOG_ERROR("MODULE", "Error message: %s", error_msg);
-```
-
-日志级别：`Debug` < `Info` < `Warn` < `Error`
 
 ## 开发计划
 

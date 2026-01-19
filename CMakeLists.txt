@@ -4,17 +4,12 @@ project(bsp-lib VERSION 1.0.0 LANGUAGES CXX)
 include(cmake/functions.cmake)
 include(cmake/toolchain.cmake)
 
-# 日志级别选项（默认 DEBUG）
-option(BSP_LOG_LEVEL_DEBUG "Enable debug logs" ON)
-if(BSP_LOG_LEVEL_DEBUG)
-    add_definitions(-DBSP_LOG_LEVEL=0)
-else()
-    add_definitions(-DBSP_LOG_LEVEL=1)
-endif()
+# 查找 spdlog 库
+list(APPEND CMAKE_PREFIX_PATH "/home/lrq/linux/nfs/qtrootfs/usr/")
+find_package(spdlog REQUIRED)
 
 # 公共基础层源文件
 set(COMMON_SOURCES
-    src/common/log.cpp
     src/common/error.cpp
     src/common/utils.cpp
 )
@@ -38,14 +33,17 @@ add_library(bsp SHARED
 )
 
 # 设置库的头文件包含路径
-target_include_directories(bsp PUBLIC
+target_include_directories(bsp 
+PRIVATE
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src
 )
 
 # 链接库
-target_link_libraries(bsp PUBLIC
+target_link_libraries(bsp 
+PRIVATE
     pthread
+    spdlog::spdlog
 )
 
 # 设置库版本
@@ -98,6 +96,5 @@ message(STATUS "BSP Library Configuration:")
 message(STATUS "  Version: ${PROJECT_VERSION}")
 message(STATUS "  C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "  Debug Logs: ${BSP_LOG_LEVEL_DEBUG}")
 message(STATUS "  Install Prefix: ${CMAKE_INSTALL_PREFIX}")
 

@@ -1,5 +1,5 @@
 #include "led.h"
-#include "../../common/bsp_common.h"
+#include "common/bsp_common.h"
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
@@ -45,7 +45,7 @@ ErrorCode Led::init()
 {
     if (initialized_)
     {
-        BSP_LOG_WARN("LED", "Device %s already initialized", dev_name_.c_str());
+        spdlog::warn("Device {} already initialized", dev_name_);
         return ErrorCode::Ok;
     }
 
@@ -53,12 +53,12 @@ ErrorCode Led::init()
     fd_ = open(dev_path_.c_str(), O_RDWR);
     if (fd_ < 0)
     {
-        BSP_LOG_ERROR("LED", "open %s failed", dev_path_.c_str());
+        spdlog::error("open {} failed", dev_path_);
         return ErrorCode::DevOpen;
     }
 
     initialized_ = true;
-    BSP_LOG_INFO("LED", "init %s success", dev_name_.c_str());
+    spdlog::info("init {} success", dev_name_);
     return ErrorCode::Ok;
 }
 
@@ -66,7 +66,7 @@ ErrorCode Led::setState(bool on)
 {
     if (!initialized_ || fd_ < 0)
     {
-        BSP_LOG_ERROR("LED", "%s not ready (not initialized)", dev_name_.c_str());
+        spdlog::error("{} not ready (not initialized)", dev_name_);
         return ErrorCode::DevNotReady;
     }
 
@@ -78,11 +78,11 @@ ErrorCode Led::setState(bool on)
         ret = ioctl(this->fd_, LED_OFF);
     if (ret == -1)
     {
-        BSP_LOG_ERROR("LED", "set %s state failed (on=%d)", dev_name_.c_str(), on);
+        spdlog::error("set {} state failed (on={})", dev_name_, on);
         return ErrorCode::DevIo;
     }
 
-    BSP_LOG_DEBUG("LED", "set %s to %s", dev_name_.c_str(), on ? "on" : "off");
+    spdlog::debug("set {} to {}", dev_name_, on ? "on" : "off");
     return ErrorCode::Ok;
 }
 

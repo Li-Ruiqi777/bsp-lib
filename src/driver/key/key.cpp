@@ -1,4 +1,5 @@
 #include "key.h"
+#include "common/bsp_common.h"
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
@@ -61,7 +62,7 @@ ErrorCode Key::init()
 {
     if (initialized)
     {
-        BSP_LOG_WARN("KEY", "Device %s already initialized", devName.c_str());
+        spdlog::warn("Device {} already initialized", devName);
         return ErrorCode::Ok;
     }
 
@@ -69,12 +70,12 @@ ErrorCode Key::init()
     fd = open(devPath.c_str(), O_RDONLY);
     if (fd < 0)
     {
-        BSP_LOG_ERROR("KEY", "open %s failed", devPath.c_str());
+        spdlog::error("open {} failed", devPath);
         return ErrorCode::DevOpen;
     }
 
     initialized = true;
-    BSP_LOG_INFO("KEY", "init %s success", devName.c_str());
+    spdlog::info("init {} success", devName);
     return ErrorCode::Ok;
 }
 
@@ -82,13 +83,13 @@ ErrorCode Key::start()
 {
     if (!initialized || fd < 0)
     {
-        BSP_LOG_ERROR("KEY", "%s not ready (not initialized)", devName.c_str());
+        spdlog::error("{} not ready (not initialized)", devName);
         return ErrorCode::DevNotReady;
     }
 
     if (running)
     {
-        BSP_LOG_WARN("KEY", "Device %s already running", devName.c_str());
+        spdlog::warn("Device {} already running", devName);
         return ErrorCode::Ok;
     }
 
@@ -96,13 +97,13 @@ ErrorCode Key::start()
     try
     {
         eventThread = std::thread(&Key::eventLoop, this);
-        BSP_LOG_INFO("KEY", "start %s success", devName.c_str());
+        spdlog::info("start {} success", devName);
         return ErrorCode::Ok;
     }
     catch (const std::exception &e)
     {
         running = false;
-        BSP_LOG_ERROR("KEY", "Failed to start event loop: %s", e.what());
+        spdlog::error("Failed to start event loop: {}", e.what());
         return ErrorCode::DevIo;
     }
 }
@@ -121,7 +122,7 @@ ErrorCode Key::stop()
         eventThread.join();
     }
 
-    BSP_LOG_INFO("KEY", "stop %s success", devName.c_str());
+    spdlog::info("stop {} success", devName);
     return ErrorCode::Ok;
 }
 
@@ -149,7 +150,7 @@ void Key::eventLoop()
 {
     struct input_event event;
 
-    BSP_LOG_DEBUG("KEY", "Event loop started for %s", devName.c_str());
+    spdlog::debug("Event loop started for {}", devName);
 
     while (running)
     {
@@ -159,21 +160,21 @@ void Key::eventLoop()
         {
             if (running)
             {
-                BSP_LOG_ERROR("KEY", "read from %s failed", devName.c_str());
+                spdlog::error("read from {} failed", devName);
             }
             break;
         }
 
         if (n != sizeof(struct input_event))
         {
-            BSP_LOG_WARN("KEY", "read size mismatch from %s", devName.c_str());
+            spdlog::warn("read size mismatch from {}", devName);
             continue;
         }
 
         // 只处理按键事件
         if (event.type == EV_KEY)
         {
-            BSP_LOG_DEBUG("KEY", "Event from %s - code: %d, value: %d", devName.c_str(),
+            spdlog::debug("Event from {} - code: {}, value: {}", devName,
                           event.code, event.value);
 
             // 按键按下时，记录按下信息
@@ -205,7 +206,7 @@ void Key::eventLoop()
                         if (callback)
                         {
                             callback(event.code, 2);
-                            BSP_LOG_DEBUG("KEY", "Long press detected - code: %d, duration: %ld ms",
+                            spdlog::debug("Long press detected - code: {}, duration: {} ms",
                                         event.code, duration.count());
                         }
                     }
@@ -219,7 +220,7 @@ void Key::eventLoop()
         }
     }
 
-    BSP_LOG_DEBUG("KEY", "Event loop ended for %s", devName.c_str());
+    spdlog::debug("Event loop ended for {}", devName);
 }
 
 void Key::cleanup()

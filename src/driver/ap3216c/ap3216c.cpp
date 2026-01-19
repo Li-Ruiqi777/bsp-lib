@@ -1,7 +1,9 @@
 #include "ap3216c.h"
+#include "common/bsp_common.h"
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
+#include <spdlog/spdlog.h>
 #include <unistd.h>
 
 namespace bsp
@@ -45,7 +47,7 @@ ErrorCode AP3216C::init()
 {
     if (initialized)
     {
-        BSP_LOG_WARN("AP3216C", "Device %s already initialized", devName.c_str());
+        spdlog::warn("Device {} already initialized", devName);
         return ErrorCode::Ok;
     }
 
@@ -53,12 +55,12 @@ ErrorCode AP3216C::init()
     fd = open(devPath.c_str(), O_RDWR);
     if (fd < 0)
     {
-        BSP_LOG_ERROR("AP3216C", "open %s failed", devPath.c_str());
+        spdlog::error("open {} failed", devPath);
         return ErrorCode::DevOpen;
     }
 
     initialized = true;
-    BSP_LOG_INFO("AP3216C", "init %s success", devName.c_str());
+    spdlog::info("init {} success", devName);
     return ErrorCode::Ok;
 }
 
@@ -66,7 +68,7 @@ ErrorCode AP3216C::readData(AP3216CData &data)
 {
     if (!initialized || fd < 0)
     {
-        BSP_LOG_ERROR("AP3216C", "%s not ready (not initialized)", devName.c_str());
+        spdlog::error("{} not ready (not initialized)", devName);
         return ErrorCode::DevNotReady;
     }
 
@@ -76,8 +78,8 @@ ErrorCode AP3216C::readData(AP3216CData &data)
 
     if (n != sizeof(rawData))
     {
-        BSP_LOG_ERROR("AP3216C", "read size mismatch from %s: expected %zu, got %zd",
-                     devName.c_str(), sizeof(rawData), n);
+        spdlog::error("read size mismatch from {}: expected {}, got {}",
+                     devName, sizeof(rawData), n);
         return ErrorCode::DevIo;
     }
 
@@ -86,8 +88,8 @@ ErrorCode AP3216C::readData(AP3216CData &data)
     data.als = rawData[1];
     data.ps = rawData[2];
 
-    BSP_LOG_DEBUG("AP3216C", "Read from %s - IR: %u, ALS: %u, PS: %u",
-                  devName.c_str(), data.ir, data.als, data.ps);
+    spdlog::debug("Read from {} - IR: {}, ALS: {}, PS: {}",
+                  devName, data.ir, data.als, data.ps);
 
     return ErrorCode::Ok;
 }

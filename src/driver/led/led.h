@@ -1,7 +1,7 @@
 #ifndef LED_H
 #define LED_H
 
-#include "../../common/bsp_common.h"
+#include "common/bsp_common.h"
 #include <string>
 #include <sys/ioctl.h> //ioctl() 声明和 _IO 系列宏
 

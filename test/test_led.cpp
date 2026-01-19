@@ -26,12 +26,12 @@ static int fail_count = 0;
         }                                                                                                    \
     } while (0)
 
-// 测试正常功能（如果设备存在）
+// 测试正常功能
 void test_normal_function()
 {
     std::printf("\n=== Testing Normal Function ===\n");
 
-    // 尝试初始化 led（如果设备存在）
+    // 尝试初始化led
     Led led("led");
     ErrorCode ret = led.init();
 
@@ -42,6 +42,8 @@ void test_normal_function()
         // 测试设置 LED 为打开
         ret = led.turnOn();
         TEST_ASSERT(ret == ErrorCode::Ok, "led.turnOn()");
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
         // 测试设置 LED 为关闭
         ret = led.turnOff();
